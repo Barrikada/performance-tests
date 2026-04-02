@@ -95,6 +95,11 @@ class AccountsGatewayHTTPClient(HttpClient):
         response = self.open_credit_card_account_api(request)
         return response.json()
 
+    def open_debit_card_account(self, user_id: str) -> dict:
+        request = OpenDebitCardAccountRequestDict(userId=user_id)
+        response = self.open_debit_card_account_api(request)
+        return response.json()
+
 
 def build_accounts_gateway_http_client() -> AccountsGatewayHTTPClient:
     return AccountsGatewayHTTPClient(client=Client(base_url="http://localhost:8003"))
