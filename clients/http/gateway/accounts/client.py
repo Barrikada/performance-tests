@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from httpx import Response, QueryParams
+from httpx import Client, QueryParams, Response
 
 from clients.http.client import HttpClient
 
@@ -89,3 +89,12 @@ class AccountsGatewayHTTPClient(HttpClient):
         :return: Объект httpx.Response.
         """
         return self.post("/api/v1/accounts/open-credit-card-account", json=request)
+
+    def open_credit_card_account(self, user_id: str) -> dict:
+        request = OpenCreditCardAccountRequestDict(userId=user_id)
+        response = self.open_credit_card_account_api(request)
+        return response.json()
+
+
+def build_accounts_gateway_http_client() -> AccountsGatewayHTTPClient:
+    return AccountsGatewayHTTPClient(client=Client(base_url="http://localhost:8003"))
