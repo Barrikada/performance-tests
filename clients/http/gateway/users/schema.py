@@ -1,11 +1,10 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserSchema(BaseModel):
     """
-    Модель данных пользователя.
+    Описание структуры пользователя.
     """
-
     id: str
     email: EmailStr
     last_name: str = Field(alias="lastName")
@@ -14,10 +13,18 @@ class UserSchema(BaseModel):
     phone_number: str = Field(alias="phoneNumber")
 
 
+class GetUserResponseSchema(BaseModel):
+    """
+    Описание структуры ответа получения пользователя.
+    """
+    user: UserSchema
+
+
 class CreateUserRequestSchema(BaseModel):
     """
-    Модель запроса на создание пользователя.
+    Структура данных для создания нового пользователя.
     """
+    model_config = ConfigDict(populate_by_name=True)
 
     email: EmailStr
     last_name: str = Field(alias="lastName")
@@ -28,7 +35,6 @@ class CreateUserRequestSchema(BaseModel):
 
 class CreateUserResponseSchema(BaseModel):
     """
-    Модель ответа на создание пользователя.
+    Описание структуры ответа создания пользователя.
     """
-
     user: UserSchema

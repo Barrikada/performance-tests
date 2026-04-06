@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from httpx import Response
+from httpx import Client, Response
 
 from clients.http.client import HttpClient
 
@@ -45,3 +45,24 @@ class CardsGatewayHTTPClient(HttpClient):
         :return: объект Response с данными ответа от сервера
         """
         return self.post(f"/api/v1/cards/issue-physical-card", json=request)
+
+    def issue_physical_card(self, user_id: str, account_id: str) -> dict:
+        """
+        Выпуск физической карты для указанного пользователя и счёта.
+
+        :param user_id: Идентификатор пользователя.
+        :param account_id: Идентификатор счёта.
+        :return: Распарсенный JSON-ответ с данными карты.
+        """
+        request = CreatePhysicalCardRequestDict(userId=user_id, accountId=account_id)
+        response = self.issue_physical_card_api(request)
+        return response.json()
+
+
+def build_cards_gateway_http_client() -> CardsGatewayHTTPClient:
+    """
+    Функция создаёт экземпляр CardsGatewayHTTPClient с настроенным HTTP-клиентом.
+
+    :return: Готовый к использованию CardsGatewayHTTPClient.
+    """
+    return CardsGatewayHTTPClient(client=Client(base_url="http://localhost:8003"))
