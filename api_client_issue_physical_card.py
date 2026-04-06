@@ -16,6 +16,6 @@ print("Open debit card account response:", open_debit_card_account_response)
 
 issue_physical_card_response = cards_gateway_client.issue_physical_card(
     user_id=create_user_response.user.id,
-    account_id=open_debit_card_account_response["account"]["id"],
+    account_id=open_debit_card_account_response.account.id,
 )
 print("Issue physical card response:", issue_physical_card_response)

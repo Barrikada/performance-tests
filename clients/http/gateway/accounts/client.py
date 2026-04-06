@@ -3,6 +3,7 @@ from typing import TypedDict
 from httpx import Client, QueryParams, Response
 
 from clients.http.client import HttpClient
+from clients.http.gateway.accounts.schema import OpenAccountResponseSchema
 
 
 class GetAccountsQueryDict(TypedDict):
@@ -90,15 +91,15 @@ class AccountsGatewayHTTPClient(HttpClient):
         """
         return self.post("/api/v1/accounts/open-credit-card-account", json=request)
 
-    def open_credit_card_account(self, user_id: str) -> dict:
+    def open_credit_card_account(self, user_id: str) -> OpenAccountResponseSchema:
         request = OpenCreditCardAccountRequestDict(userId=user_id)
         response = self.open_credit_card_account_api(request)
-        return response.json()
+        return OpenAccountResponseSchema.model_validate_json(response.text)
 
-    def open_debit_card_account(self, user_id: str) -> dict:
+    def open_debit_card_account(self, user_id: str) -> OpenAccountResponseSchema:
         request = OpenDebitCardAccountRequestDict(userId=user_id)
         response = self.open_debit_card_account_api(request)
-        return response.json()
+        return OpenAccountResponseSchema.model_validate_json(response.text)
 
 
 def build_accounts_gateway_http_client() -> AccountsGatewayHTTPClient:

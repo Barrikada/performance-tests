@@ -1,68 +1,59 @@
-from typing import TypedDict
-
-from httpx import Client, Response
+from httpx import Response
 
 from clients.http.client import HttpClient
-
-
-class CreateVirtualCardRequestDict(TypedDict):
-    """
-    Структура тела запроса для выпуска виртуальной карты.
-
-    :param userId: идентификатор пользователя
-    :param accountId: идентификатор аккаунта
-    """
-    userId: str
-    accountId: str
-
-
-class CreatePhysicalCardRequestDict(TypedDict):
-    """
-    Структура тела запроса для выпуска физической карты.
-
-    :param userId: идентификатор пользователя
-    :param accountId: идентификатор аккаунта
-    """
-    userId: str
-    accountId: str
+from clients.http.gateway.cards.schema import (
+    IssuePhysicalCardRequestSchema,
+    IssuePhysicalCardResponseSchema,
+    IssueVirtualCardRequestSchema,
+    IssueVirtualCardResponseSchema,
+)
+from clients.http.gateway.client import build_gateway_http_client
 
 
 class CardsGatewayHTTPClient(HttpClient):
-    def issue_virtual_card_api(self, request: CreateVirtualCardRequestDict) -> Response:
-        """
-        Выполняет запрос на выпуск виртуальной карты.
+    """
+    Клиент для взаимодействия с /api/v1/cards сервиса http-gateway.
+    """
 
-        :param request: тело запроса с данными пользователя
-        :return: объект Response с данными ответа от сервера
+    def issue_virtual_card_api(self, request: IssueVirtualCardRequestSchema) -> Response:
         """
-        return self.post(f"/api/v1/cards/issue-virtual-card", json=request)
+        Выпуск виртуальной карты.
 
-    def issue_physical_card_api(self, request: CreatePhysicalCardRequestDict) -> Response:
+        :param request: Pydantic-модель с данными для выпуска виртуальной карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
-        Выполняет запрос на выпуск физической карты.
+        return self.post(
+            "/api/v1/cards/issue-virtual-card",
+            json=request.model_dump(by_alias=True),
+        )
 
-        :param request: тело запроса с данными пользователя
-        :return: объект Response с данными ответа от сервера
+    def issue_physical_card_api(self, request: IssuePhysicalCardRequestSchema) -> Response:
         """
-        return self.post(f"/api/v1/cards/issue-physical-card", json=request)
+        Выпуск физической карты.
 
-    def issue_physical_card(self, user_id: str, account_id: str) -> dict:
+        :param request: Pydantic-модель с данными для выпуска физической карты.
+        :return: Ответ от сервера (объект httpx.Response).
         """
-        Выпуск физической карты для указанного пользователя и счёта.
+        return self.post(
+            "/api/v1/cards/issue-physical-card",
+            json=request.model_dump(by_alias=True),
+        )
 
-        :param user_id: Идентификатор пользователя.
-        :param account_id: Идентификатор счёта.
-        :return: Распарсенный JSON-ответ с данными карты.
-        """
-        request = CreatePhysicalCardRequestDict(userId=user_id, accountId=account_id)
+    def issue_virtual_card(self, user_id: str, account_id: str) -> IssueVirtualCardResponseSchema:
+        request = IssueVirtualCardRequestSchema(user_id=user_id, account_id=account_id)
+        response = self.issue_virtual_card_api(request)
+        return IssueVirtualCardResponseSchema.model_validate_json(response.text)
+
+    def issue_physical_card(self, user_id: str, account_id: str) -> IssuePhysicalCardResponseSchema:
+        request = IssuePhysicalCardRequestSchema(user_id=user_id, account_id=account_id)
         response = self.issue_physical_card_api(request)
-        return response.json()
+        return IssuePhysicalCardResponseSchema.model_validate_json(response.text)
 
 
 def build_cards_gateway_http_client() -> CardsGatewayHTTPClient:
     """
-    Функция создаёт экземпляр CardsGatewayHTTPClient с настроенным HTTP-клиентом.
+    Функция создаёт экземпляр CardsGatewayHTTPClient с уже настроенным HTTP-клиентом.
 
     :return: Готовый к использованию CardsGatewayHTTPClient.
     """
-    return CardsGatewayHTTPClient(client=Client(base_url="http://localhost:8003"))
+    return CardsGatewayHTTPClient(client=build_gateway_http_client())
