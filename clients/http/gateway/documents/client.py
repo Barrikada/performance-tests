@@ -1,30 +1,11 @@
-from typing import TypedDict
-
-from httpx import Client, Response
+from httpx import Response
 
 from clients.http.client import HttpClient
-
-
-class DocumentDict(TypedDict):
-    """
-    Описание структуры документа (ссылка и текстовое содержимое).
-    """
-    url: str
-    document: str
-
-
-class GetTariffDocumentResponseDict(TypedDict):
-    """
-    Описание структуры ответа получения документа тарифа.
-    """
-    tariff: DocumentDict
-
-
-class GetContractDocumentResponseDict(TypedDict):
-    """
-    Описание структуры ответа получения документа контракта.
-    """
-    contract: DocumentDict
+from clients.http.gateway.client import build_gateway_http_client
+from clients.http.gateway.documents.schema import (
+    GetContractDocumentResponseSchema,
+    GetTariffDocumentResponseSchema,
+)
 
 
 class DocumentsGatewayHTTPClient(HttpClient):
@@ -50,7 +31,7 @@ class DocumentsGatewayHTTPClient(HttpClient):
         """
         return self.get(f"/api/v1/documents/contract-document/{account_id}")
 
-    def get_tariff_document(self, account_id: str) -> GetTariffDocumentResponseDict:
+    def get_tariff_document(self, account_id: str) -> GetTariffDocumentResponseSchema:
         """
         Получить документ тарифа по счету.
 
@@ -58,9 +39,9 @@ class DocumentsGatewayHTTPClient(HttpClient):
         :return: JSON-ответ с данными документа тарифа.
         """
         response = self.get_tariff_document_api(account_id)
-        return response.json()
+        return GetTariffDocumentResponseSchema.model_validate_json(response.text)
 
-    def get_contract_document(self, account_id: str) -> GetContractDocumentResponseDict:
+    def get_contract_document(self, account_id: str) -> GetContractDocumentResponseSchema:
         """
         Получить документ контракта по счету.
 
@@ -68,7 +49,7 @@ class DocumentsGatewayHTTPClient(HttpClient):
         :return: JSON-ответ с данными документа контракта.
         """
         response = self.get_contract_document_api(account_id)
-        return response.json()
+        return GetContractDocumentResponseSchema.model_validate_json(response.text)
 
 
 def build_documents_gateway_http_client() -> DocumentsGatewayHTTPClient:
@@ -77,4 +58,4 @@ def build_documents_gateway_http_client() -> DocumentsGatewayHTTPClient:
 
     :return: Готовый к использованию DocumentsGatewayHTTPClient.
     """
-    return DocumentsGatewayHTTPClient(client=Client(base_url="http://localhost:8003"))
+    return DocumentsGatewayHTTPClient(client=build_gateway_http_client())
