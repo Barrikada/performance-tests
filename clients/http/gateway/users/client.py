@@ -35,10 +35,8 @@ class UsersGatewayHTTPClient(HttpClient):
 
     def get_user(self, user_id: str) -> GetUserResponseSchema:
         response = self.get_user_api(user_id)
-        # Инициализируем модель через валидацию JSON строки
         return GetUserResponseSchema.model_validate_json(response.text)
 
-    # Теперь используем pydantic-модель для аннотации
     def create_user(self) -> CreateUserResponseSchema:
         request = CreateUserRequestSchema()
         response = self.create_user_api(request)
