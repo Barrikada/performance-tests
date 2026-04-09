@@ -1,6 +1,6 @@
 from httpx import QueryParams, Response
 
-from clients.http.client import HttpClient
+from clients.http.client import HTTPClient, HTTPClientExtensions
 from clients.http.gateway.operations.schema import (
     GetOperationReceiptResponseSchema,
     GetOperationResponseSchema,
@@ -27,7 +27,7 @@ from clients.http.gateway.operations.schema import (
 from clients.http.gateway.client import build_gateway_http_client
 
 
-class OperationsGatewayHTTPClient(HttpClient):
+class OperationsGatewayHTTPClient(HTTPClient):
     """
     Клиент для взаимодействия с /api/v1/operations сервиса http-gateway.
     """
@@ -39,7 +39,10 @@ class OperationsGatewayHTTPClient(HttpClient):
         :param operation_id: Идентификатор операции.
         :return: Объект httpx.Response с данными об операции.
         """
-        return self.get(f"/api/v1/operations/{operation_id}")
+        return self.get(
+            f"/api/v1/operations/{operation_id}",
+            extensions=HTTPClientExtensions(route="/api/v1/operations/{operation_id}"),
+        )
 
     def get_operation_receipt_api(self, operation_id: str) -> Response:
         """
@@ -48,7 +51,10 @@ class OperationsGatewayHTTPClient(HttpClient):
         :param operation_id: Идентификатор операции.
         :return: Объект httpx.Response с данными чека.
         """
-        return self.get(f"/api/v1/operations/operation-receipt/{operation_id}")
+        return self.get(
+            f"/api/v1/operations/operation-receipt/{operation_id}",
+            extensions=HTTPClientExtensions(route="/api/v1/operations/operation-receipt/{operation_id}"),
+        )
 
     def get_operations_api(self, query: GetOperationsQuerySchema) -> Response:
         """
@@ -60,6 +66,7 @@ class OperationsGatewayHTTPClient(HttpClient):
         return self.get(
             "/api/v1/operations",
             params=QueryParams(**query.model_dump(by_alias=True)),
+            extensions=HTTPClientExtensions(route="/api/v1/operations"),
         )
 
     def get_operations_summary_api(self, query: GetOperationsSummaryQuerySchema) -> Response:
@@ -72,6 +79,7 @@ class OperationsGatewayHTTPClient(HttpClient):
         return self.get(
             "/api/v1/operations/operations-summary",
             params=QueryParams(**query.model_dump(by_alias=True)),
+            extensions=HTTPClientExtensions(route="/api/v1/operations/operations-summary"),
         )
 
     def make_fee_operation_api(self, request: MakeFeeOperationRequestSchema) -> Response:

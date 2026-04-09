@@ -1,34 +1,52 @@
-from typing import Any
+from typing import Any, TypedDict
 
-from httpx import Client, URL, QueryParams, Response
+from httpx import Client, QueryParams, Response, URL
 
 
-class HttpClient:
+class HTTPClientExtensions(TypedDict, total=False):
+    route: str
+
+
+class HTTPClient:
     """
     Базовый HTTP API клиент, принимающий объект httpx.Client.
 
-    :param client: экземпляр httpx.Client для выполнения http-запросов
+    :param client: экземпляр httpx.Client для выполнения HTTP-запросов
     """
 
-    def __init__(self, client: Client):
+    def __init__(self, client: Client) -> None:
         self.client = client
 
-    def get(self, url: URL | str, params: QueryParams | None = None) -> Response:
+    def get(
+        self,
+        url: str | URL,
+        params: QueryParams | None = None,
+        *,
+        extensions: HTTPClientExtensions | None = None,
+    ) -> Response:
         """
-        Выполняет GET-запрос
+        Выполняет GET-запрос.
 
-        :param url: URL-адрес эндпоинта
-        :param params: GET-параметры запроса (например, ?key=value)
-        :return: Объект Response с данными ответа
+        :param url: URL-адрес эндпоинта.
+        :param params: GET-параметры запроса (например, ?key=value).
+        :param extensions: Дополнительные данные, передаваемые через HTTPX extensions.
+        :return: Объект Response с данными ответа.
         """
-        return self.client.get(url, params=params)
+        return self.client.get(url=url, params=params, extensions=extensions)
 
-    def post(self, url: URL | str, json: Any | None = None) -> Response:
+    def post(
+        self,
+        url: str | URL,
+        json: Any | None = None,
+        *,
+        extensions: HTTPClientExtensions | None = None,
+    ) -> Response:
         """
-        Выполняет POST-запрос
+        Выполняет POST-запрос.
 
-        :param url: URL-адрес эндпоинта
-        :param json: данные в формате JSON
-        :return: Объект Response с данными ответа
+        :param url: URL-адрес эндпоинта.
+        :param json: Данные в формате JSON.
+        :param extensions: Дополнительные данные, передаваемые через HTTPX extensions.
+        :return: Объект Response с данными ответа.
         """
-        return self.client.post(url, json=json)
+        return self.client.post(url=url, json=json, extensions=extensions)
