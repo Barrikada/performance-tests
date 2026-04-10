@@ -1,34 +1,34 @@
 from locust import User, between, task
 
-from clients.http.gateway.accounts.client import (
-    AccountsGatewayHTTPClient,
-    build_accounts_gateway_locust_http_client,
+from clients.grpc.gateway.accounts.client import (
+    AccountsGatewayGRPCClient,
+    build_accounts_gateway_locust_grpc_client,
 )
-from clients.http.gateway.users.client import (
-    UsersGatewayHTTPClient,
-    build_users_gateway_locust_http_client,
+from clients.grpc.gateway.users.client import (
+    UsersGatewayGRPCClient,
+    build_users_gateway_locust_grpc_client,
 )
-from clients.http.gateway.users.schema import CreateUserResponseSchema
+from contracts.services.gateway.users.rpc_create_user_pb2 import CreateUserResponse
 
 
 class OpenDebitCardAccountScenarioUser(User):
     """
-    Нагрузочный сценарий: создание пользователя и открытие дебетового счёта через HTTP API-клиенты.
+    Нагрузочный сценарий: создание пользователя и открытие дебетового счёта через gRPC API-клиенты.
     """
 
     host = "localhost"
     wait_time = between(1, 3)
 
-    users_gateway_client: UsersGatewayHTTPClient
-    accounts_gateway_client: AccountsGatewayHTTPClient
-    create_user_response: CreateUserResponseSchema
+    users_gateway_client: UsersGatewayGRPCClient
+    accounts_gateway_client: AccountsGatewayGRPCClient
+    create_user_response: CreateUserResponse
 
     def on_start(self) -> None:
         """
         Вызывается один раз на виртуального пользователя: инициализация клиентов и создание пользователя.
         """
-        self.users_gateway_client = build_users_gateway_locust_http_client(self.environment)
-        self.accounts_gateway_client = build_accounts_gateway_locust_http_client(self.environment)
+        self.users_gateway_client = build_users_gateway_locust_grpc_client(self.environment)
+        self.accounts_gateway_client = build_accounts_gateway_locust_grpc_client(self.environment)
         self.create_user_response = self.users_gateway_client.create_user()
 
     @task
