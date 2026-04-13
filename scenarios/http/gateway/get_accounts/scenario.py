@@ -7,6 +7,7 @@ from clients.http.gateway.users.schema import CreateUserResponseSchema
 class GetAccountsTaskSet(GatewayHTTPTaskSet):
     """
     Нагрузочный TaskSet: создание пользователя, открытие депозита, список счетов.
+    Задачи в произвольном порядке; open_deposit_account и get_accounts зависят от shared state.
     """
 
     create_user_response: CreateUserResponseSchema | None = None

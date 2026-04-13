@@ -7,6 +7,7 @@ from contracts.services.gateway.users.rpc_create_user_pb2 import CreateUserRespo
 class GetAccountsTaskSet(GatewayGRPCTaskSet):
     """
     Нагрузочный TaskSet: создание пользователя, открытие депозита, список счетов (gRPC).
+    Задачи в произвольном порядке; open_deposit_account и get_accounts зависят от shared state.
     """
 
     create_user_response: CreateUserResponse | None = None
