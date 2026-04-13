@@ -1,7 +1,8 @@
 from grpc import Channel
+from locust.env import Environment
 
 from clients.grpc.client import GRPCClient
-from clients.grpc.gateway.client import build_gateway_grpc_client
+from clients.grpc.gateway.client import build_gateway_grpc_client, build_gateway_locust_grpc_client
 from contracts.services.gateway.documents.documents_gateway_service_pb2_grpc import DocumentsGatewayServiceStub
 from contracts.services.gateway.documents.rpc_get_contract_document_pb2 import (
     GetContractDocumentRequest,
@@ -75,3 +76,14 @@ def build_documents_gateway_grpc_client() -> DocumentsGatewayGRPCClient:
     :return: Инициализированный клиент для DocumentsGatewayService.
     """
     return DocumentsGatewayGRPCClient(channel=build_gateway_grpc_client())
+
+
+def build_documents_gateway_locust_grpc_client(environment: Environment) -> DocumentsGatewayGRPCClient:
+    """
+    Создаёт DocumentsGatewayGRPCClient для нагрузочного тестирования в Locust.
+    Канал собирается через build_gateway_locust_grpc_client (интерцептор метрик Locust).
+
+    :param environment: окружение Locust для отправки событий request.
+    :return: клиент DocumentsGatewayGRPCClient поверх канала с Locust-интерцептором.
+    """
+    return DocumentsGatewayGRPCClient(channel=build_gateway_locust_grpc_client(environment))
