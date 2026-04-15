@@ -203,6 +203,9 @@ class OperationsGatewayHTTPClient(HTTPClient):
         response = self.make_top_up_operation_api(request)
         return MakeTopUpOperationResponseSchema.model_validate_json(response.text)
 
+    def make_top_up_operation(self, card_id: str, account_id: str) -> MakeTopUpOperationResponseSchema:
+        return self.make_top_up_operations(card_id, account_id)
+
     def make_cashback_operation(self, card_id: str, account_id: str) -> MakeCashbackOperationResponseSchema:
         request = MakeCashbackOperationRequestSchema(
             card_id=card_id,
