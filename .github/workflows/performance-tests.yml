@@ -28,6 +28,9 @@ on:
         required: true
         description: Locust config file
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
@@ -69,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reports-${{ github.run_id }}
-          path: reports
+          path: ./reports/${{ github.run_id }}
           if-no-files-found: warn
 
       - name: Stop test services
@@ -92,7 +95,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: reports-${{ github.run_id }}
-          path: .
+          path: ./reports/${{ github.run_id }}
 
       - name: Deploy HTML report to GitHub Pages
         if: always()
